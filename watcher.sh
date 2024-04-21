@@ -13,7 +13,7 @@
 
 NAMESPACE="sre"
 DEPLOYMENT_NAME="swype-app"
-MAX_RESTARTS=2
+MAX_RESTARTS=5
 
 while [ true ];
 do
