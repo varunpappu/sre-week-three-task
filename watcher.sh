@@ -17,16 +17,21 @@ MAX_RESTARTS=5
 
 while [ true ];
 do
+    date
     podRestartCount=$(kubectl get pods -l=app=${DEPLOYMENT_NAME} -n ${NAMESPACE} -o jsonpath='{.items[*].status.containerStatuses[0].restartCount}')    
-    echo "Restart count for underlying replicas: ${podRestartCount}"
-    # Check if the restart count is greater than the maximum allowed restarts for one of the pods
-    for count in ${podRestartCount}; do        
-       if [ $count -gt $MAX_RESTARTS ]; then
-            echo "Restart Count is greater than ${MAX_RESTARTS}. Scaling down the deployment ${DEPLOYMENT_NAME} for namespace ${NAMESPACE}"
-            kubectl scale deployment ${DEPLOYMENT_NAME} -n ${NAMESPACE} --replicas=0
-            break
-        fi
-    done
+    # Check if podRestartCount is not empty
+    if [ -n "$podRestartCount" ]; then
+        # Continue with the rest of the code
+        echo "Restart count for underlying replicas: ${podRestartCount}"
+        # Check if the restart count is greater than the maximum allowed restarts for one of the pods
+        for count in ${podRestartCount}; do        
+           if [ $count -gt $MAX_RESTARTS ]; then
+                echo "Restart Count is greater than ${MAX_RESTARTS}. Scaling down the deployment ${DEPLOYMENT_NAME} for namespace ${NAMESPACE}"
+                kubectl scale deployment ${DEPLOYMENT_NAME} -n ${NAMESPACE} --replicas=0
+                break
+            fi
+        done
+    fi   
     echo "Pausing for 60 seconds before next check..."
     sleep 60
 done  
